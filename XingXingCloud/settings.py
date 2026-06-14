@@ -105,7 +105,7 @@ USE_I18N = True # 开启国际化
 USE_TZ = True # 开启时区支持
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'DZYCWeb/static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

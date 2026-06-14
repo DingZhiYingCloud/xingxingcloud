@@ -3,7 +3,7 @@ from django.db import models
 # 迁移模型
 # python manage.py makemigrations
 # python manage.py migrate
-
+# xingxingcloud.cloud
 
 class BaseModel(models.Model):
     """项目基础模型，所有业务模型继承此类"""
