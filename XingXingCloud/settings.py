@@ -25,6 +25,12 @@ CORS_ALLOW_ALL_ORIGINS = True
 # 允许使用标签内嵌页面
 X_FRAME_OPTIONS = 'ALLOWALL'
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# CSRF 信任来源 - HTTPS 下 POST 请求需要通过此校验
+CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', 'https://www.xingxingcloud.cloud,https://xingxingcloud.cloud').split(',')
+
+
 # Application definition
 
 INSTALLED_APPS = [
