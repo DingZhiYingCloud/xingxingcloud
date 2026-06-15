@@ -4,4 +4,4 @@ django-cors-headers
 cryptography
 requests
 python-dotenv
-
+lxml

@@ -11,6 +11,8 @@ urlpatterns = [
     path("create/", request.create_admin, name="create_admin"),
     path("<int:admin_id>/update/", request.update_admin, name="update_admin"),
     path("<int:admin_id>/delete/", request.delete_admin, name="delete_admin"),
+    path("set_user_info/", request.set_user_info, name="set_user_info"),    
+
     # JsCommand
     path("js_command/", request.list_js_commands, name="list_js_commands"),
     path("js_command/<int:cmd_id>/", request.get_js_command, name="get_js_command"),

